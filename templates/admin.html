@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zentry-Code | Bot Manager</title>
+    <title>Zentry-Code | Bot Manager & Terminal</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
         body { background: #050508; color: #00ff66; font-family: monospace; margin: 0; padding: 20px; }
@@ -16,10 +16,10 @@
         .dashboard { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; height: 90vh; }
         .panel { flex: 1; background: #0d0d12; border: 1px solid #00ff66; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 0 15px rgba(0,255,102,0.1); }
         .panel.right { border-color: #ff0033; box-shadow: 0 0 15px rgba(255,0,51,0.1); }
-        textarea.editor { flex: 1; resize: none; height: 400px; }
-        pre.terminal { background: #000; border: 1px dashed #ff0033; padding: 15px; flex: 1; overflow-y: auto; color: #ff0033; white-space: pre-wrap; }
+        textarea.editor { flex: 1; resize: none; height: 350px; }
+        pre.terminal { background: #000; border: 1px dashed #ff0033; padding: 15px; flex: 1; overflow-y: auto; color: #ff0033; white-space: pre-wrap; margin-bottom: 10px; }
         .bot-list { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        .bot-btn { background: #111; border: 1px solid #00ff66; color: #00ff66; padding: 5px 10px; text-decoration: none; }
+        .bot-btn { background: #111; border: 1px solid #00ff66; color: #00ff66; padding: 5px 10px; text-decoration: none; font-size: 13px; }
         .bot-btn.active { background: #00ff66; color: #000; font-weight: bold; }
         .err { color: #ff0033; margin-bottom: 10px; }
         a { color: #00ff66; text-decoration: none; }
@@ -38,18 +38,16 @@
         </div>
     {% else %}
         <div class="dashboard">
-            <!-- CHAP TOMON: Bot qo'shish va kod yozish -->
+            <!-- CHAP TOMON: Bot va kod boshqaruvi -->
             <div class="panel">
                 <h2>// KOD & BOTLAR MUHARRIRI</h2>
                 
-                <!-- Yangi bot qo'shish formasi -->
                 <form action="/admin/bot/create" method="post" style="display: flex; gap: 10px;">
-                    <input type="text" name="bot_name" placeholder="Bot nomi (masalan: my_bot.py)" required style="margin-bottom:0;">
+                    <input type="text" name="bot_name" placeholder="Bot nomi (masalan: telebot.py)" required style="margin-bottom:0;">
                     <button type="submit" class="green">YARATISH</button>
                 </form>
                 <hr style="border-color: #222; margin: 15px 0;">
 
-                <!-- Mavjud botlar ro'yxati -->
                 <div class="bot-list">
                     {% for b in bot_files %}
                         <a href="/admin?bot={{ b }}" class="bot-btn {% if b == selected_bot %}active{% endif %}">{{ b }}</a>
@@ -66,7 +64,7 @@
                 </form>
                 <form action="/admin/bot/run" method="post" style="margin-top: 10px;">
                     <input type="hidden" name="bot_name" value="{{ selected_bot }}">
-                    <button type="submit" style="width:100%; background:#ff0033;">▶ ISHGA TUSHURISH (EXECUTE)</button>
+                    <button type="submit" style="width:100%; background:#ff0033;">▶ BOTNI ISHGA TUSHURISH</button>
                 </form>
                 {% else %}
                 <p style="color:#777;">Hali botlar yaratilmagan. Yuqoridan yangi bot qo'shing.</p>
@@ -77,12 +75,20 @@
                 </form>
             </div>
 
-            <!-- O'NG TOMON: Terminal va Natijalar -->
+            <!-- O'NG TOMON: Terminal & Pip Install -->
             <div class="panel right">
-                <h2>// ISHGA TUSHURISH TERMINALI</h2>
-                <p style="font-size: 13px; color: #aaa;">Tanlangan bot yoki skriptni ishga tushirgandagi natijalar va loglar:</p>
-                <pre class="terminal">{% if output %}{{ output }}{% else %}// Terminal tayyor. Botni ishga tushirish uchun chap tomondagi tugmani bosing...{% endif %}</pre>
-                <br>
+                <h2>// TERMINAL & PIP INSTALL</h2>
+                <p style="font-size: 12px; color: #aaa; margin-top: 0;">Modul o'rnatish uchun: <code>pip install pytelegrambotapi</code></p>
+                
+                <!-- Terminal buyruq yuborish formasi -->
+                <form action="/admin/shell" method="post" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="hidden" name="selected_bot" value="{{ selected_bot }}">
+                    <input type="text" name="cmd" placeholder="Buyruq kiriting (masalan: pip install requests)..." required style="margin-bottom:0;">
+                    <button type="submit" class="green">RUN</button>
+                </form>
+
+                <pre class="terminal">{% if output %}{{ output }}{% else %}// Terminal tayyor. Buyruq natijalari shu yerda chiqadi...{% endif %}</pre>
+                
                 <a href="/" style="text-align: center;">&larr; Veb-sayt bosh sahifasiga o'tish</a>
             </div>
         </div>
