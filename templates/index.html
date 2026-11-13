@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090a0d">
+  <meta name="description" content="Faxriddin Baxodirov — Zentry404. Kiberxavfsizlik, dasturlash va Telegram botlar.">
+  <title>Zentry404 — Faxriddin Baxodirov</title>
+  <link rel="icon" href="{{ url_for('static', path='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar wrap">
+    <a class="brand" href="#home" aria-label="Zentry404 bosh sahifa">
+      <img src="{{ url_for('static', path='logo.svg') }}" alt="Zentry404 logotipi">
+      <span>ZENTRY<span class="accent">404</span></span>
+    </a>
+    <nav aria-label="Asosiy navigatsiya">
+      <a href="#about">Men haqimda</a><a href="#skills">Yo‘nalishlar</a><a href="#contact">Aloqa</a>
+    </nav>
+    <a class="availability" href="https://t.me/Zentry_live" target="_blank" rel="noreferrer"><i></i> Telegram’da bog‘lanish</a>
+  </header>
+
+  <main id="home">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> SHAXSIY PROFIL <span class="muted">/ FARG‘ONA, UZ</span></p>
+        <h1>Salom, men<br><span class="name">Faxriddin</span><span class="cursor">_</span></h1>
+        <p class="hero-subtitle">Raqamli makon uchun <span>mustahkam tizimlar</span> va o‘ylangan tajribalar yarataman.</p>
+        <p class="hero-description">Kiberxavfsizlik, frontend/backend dasturlash va Telegram botlar arxitekturasi bilan shug‘ullanuvchi dasturchi. Texnik laqabim — <strong>Zentry404</strong>.</p>
+        <div class="hero-actions"><a class="button button-primary" href="https://t.me/zentry404" target="_blank" rel="noreferrer">Loyiha haqida gaplashamiz <span>↗</span></a><a class="text-link" href="#about">Profilni ko‘rish <span>↓</span></a></div>
+        <div class="hero-meta"><span><b>01</b> XAVFSIZLIK</span><span><b>02</b> DASTURLASH</span><span><b>03</b> BOTLAR</span></div>
+      </div>
+      <div class="hero-art" aria-label="Zentry404 logotipi">
+        <div class="art-grid"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="logo-frame"><img src="{{ url_for('static', path='logo.svg') }}" alt="Zentry404 qalqon logotipi"></div>
+        <span class="art-tag tag-top">SYSTEMS / SECURE</span><span class="art-tag tag-bottom">ZENTRY404 — EST. 2024</span>
+        <span class="art-cross cross-one">+</span><span class="art-cross cross-two">+</span>
+      </div>
+      <a class="scroll-hint" href="#about"><span></span> PASTGA AYLANING</a>
+    </section>
+
+    <section class="section wrap" id="about">
+      <div class="section-heading"><p class="eyebrow"><span class="eyebrow-line"></span> 01 / MEN HAQIMDA</p><span class="section-index">PROFILE_DATA</span></div>
+      <div class="about-grid">
+        <div class="about-intro"><h2>Qiziqishdan<br><span>muhandislikka.</span></h2><p>Texnologiyalarni o‘rganish, ularni amalda qo‘llash va foydali mahsulotlarga aylantirish — mening asosiy motivatsiyam.</p></div>
+        <div class="profile-card">
+          <div class="card-top"><span>IDENTITY_CARD</span><span class="online"><i></i> AVAILABLE</span></div>
+          <div class="profile-row"><span class="key">ISM</span><span>Faxriddin Baxodirov</span></div>
+          <div class="profile-row"><span class="key">NICKNAME</span><span class="green">Zentry404</span></div>
+          <div class="profile-row"><span class="key">MANZIL</span><span>Farg‘ona, O‘zbekiston</span></div>
+          <div class="profile-row"><span class="key">HOBBY</span><span>Telegram botlar yaratish</span></div>
+          <div class="profile-row"><span class="key">FOCUS</span><span>AI · Cybersecurity · Backend</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="skills">
+      <div class="section-heading"><p class="eyebrow"><span class="eyebrow-line"></span> 02 / YO‘NALISHLAR</p><span class="section-index">WHAT_I_BUILD</span></div>
+      <div class="skills-grid">
+        <article class="skill-card"><span class="skill-number">01</span><div class="skill-icon">⌘</div><h3>Kiberxavfsizlik</h3><p>Tizimlarni himoyalash, xavfsizlik tamoyillari va kiberxavfsizlik uchun AI yechimlariga qiziqaman.</p><span class="skill-line"></span></article>
+        <article class="skill-card"><span class="skill-number">02</span><div class="skill-icon">&lt;/&gt;</div><h3>Web dasturlash</h3><p>Frontend va backend texnologiyalari bilan zamonaviy, qulay va ishonchli web loyihalar.</p><span class="skill-line"></span></article>
+        <article class="skill-card"><span class="skill-number">03</span><div class="skill-icon">◉</div><h3>Telegram botlar</h3><p>Avtomatlashtirilgan botlar, bot arxitekturasi va kundalik vazifalarni yengillashtiruvchi loyihalar.</p><span class="skill-line"></span></article>
+        <article class="skill-card"><span class="skill-number">04</span><div class="skill-icon">⌁</div><h3>Tizimlar va bulut</h3><p>Kali Linux, Linux terminali, tizim administratsiyasi, Supabase va Firebase bilan ishlash.</p><span class="skill-line"></span></article>
+      </div>
+      <div class="tech-strip"><span>TOOLKIT</span><b>LINUX</b><b>KALI</b><b>PYTHON</b><b>FASTAPI</b><b>SUPABASE</b><b>FIREBASE</b><b>TELEGRAM API</b></div>
+    </section>
+
+    <section class="future wrap">
+      <div class="future-mark">Z<span>4</span></div><div><p class="eyebrow"><span class="eyebrow-line"></span> KEYINGI BOSQICH</p><h2>Doim o‘rganishda.<br><span>Doim yaratishda.</span></h2><p class="future-copy">AI muhandisligi, Flutter va backend tizimlarini chuqur o‘rganish, shaxsiy hamjamiyat forumlarini rivojlantirish — oldimdagi maqsadlar.</p></div>
+      <div class="future-status"><span class="online"><i></i> IN PROGRESS</span><span>BUILDING THE NEXT</span></div>
+    </section>
+
+    <section class="contact wrap" id="contact"><p class="eyebrow"><span class="eyebrow-line"></span> 03 / ALOQA</p><h2>Biror loyiha<br><span>rejangiz bormi?</span></h2><p>Telegram bot yaratish, texnik loyiha yoki hamкорlik тухай yozing — bog‘ланайлик.</p><div class="contact-links"><a class="button button-primary" href="https://t.me/zentry404" target="_blank" rel="noreferrer">@zentry404 <span>↗</span></a><a class="button button-quiet" href="https://t.me/Zentry_live" target="_blank" rel="noreferrer">Telegram kanal <span>↗</span></a></div><div class="social-links"><a href="https://defsec.lovable.app" target="_blank" rel="noreferrer">SHAXSIY PLATFORMAM ↗</a><a href="https://www.linkedin.com/in/faxriddin-bahodirov-1174273a7/" target="_blank" rel="noreferrer">LINKEDIN ↗</a></div></section>
+  </main>
+
+  <footer class="footer wrap"><a class="brand footer-brand" href="#home"><img src="{{ url_for('static', path='logo.svg') }}" alt=""><span>ZENTRY<span class="accent">404</span></span></a><span>© 2026 FAXRIDDIN BAXODIROV</span><a href="#home">YUQORIGA ↑</a></footer>
+</body>
+</html>

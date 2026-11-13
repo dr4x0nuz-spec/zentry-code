@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="title">
+<title id="title">Zentry404 emblem</title>
+<defs><linearGradient id="g" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#f1f2f4"/><stop offset=".48" stop-color="#7c8189"/><stop offset="1" stop-color="#30343b"/></linearGradient><filter id="s"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<path d="M200 25 343 78v103c0 91-58 155-143 197C115 336 57 272 57 181V78L200 25Z" fill="#0c0e12" stroke="url(#g)" stroke-width="15"/>
+<path d="M83 101h234l-48 38H162l-45 34h141L109 279l-7-48 102-74H82Z" fill="url(#g)" filter="url(#s)"/>
+<path d="M120 293h164l-27 30H148Z" fill="#90959d" opacity=".8"/>
+<path d="m300 100 19 7-6 69h-33Z" fill="#fa2448" opacity=".86"/>
+</svg>
