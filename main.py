@@ -14,6 +14,8 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 BASE_DIR = Path(__file__).resolve().parent
+BOTS_DIR = BASE_DIR / "bots"
+BOTS_DIR.mkdir(exist_ok=True)
 
 app = FastAPI(title="Zentry-Code | Faxriddin Baxodirov", docs_url=None, redoc_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
@@ -27,6 +29,9 @@ app.add_middleware(
     https_only=os.getenv("RENDER", "").lower() == "true",
     max_age=60 * 60 * 12,
 )
+
+# Faol bot jarayonlarini saqlash uchun lug'at (Process manager)
+active_processes = {}
 
 
 @app.middleware("http")
@@ -53,26 +58,42 @@ async def ping():
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin(request: Request):
-    if request.session.get("admin_authenticated"):
-        return templates.TemplateResponse(
-            request=request, name="admin.html", context={"error": None, "login": False, "output": None, "code": ""}
-        )
+    if not request.session.get("admin_authenticated"):
+        return templates.TemplateResponse(request=request, name="admin.html", context={"login": True, "error": None})
+    
+    # Birlikdagi barcha bot fayllarini o'qish
+    bot_files = [f.name for f in BOTS_DIR.glob("*.py")]
+    selected_bot = request.query_params.get("bot", bot_files[0] if bot_files else "")
+    
+    code_content = ""
+    if selected_bot and (BOTS_DIR / selected_bot).exists():
+        code_content = (BOTS_DIR / selected_bot).read_text(encoding="utf-8")
+
     return templates.TemplateResponse(
-        request=request, name="admin.html", context={"error": None, "login": True, "output": None, "code": ""}
+        request=request,
+        name="admin.html",
+        context={
+            "login": False,
+            "error": None,
+            "bot_files": bot_files,
+            "selected_bot": selected_bot,
+            "code": code_content,
+            "output": None
+        }
     )
 
 
 @app.post("/admin/login")
 async def admin_login(request: Request):
     configured_password = os.getenv("ADMIN_PASSWORD", "zentry2026")
-
     raw_form = (await request.body()).decode("utf-8", errors="replace")
     supplied_password = parse_qs(raw_form).get("password", [""])[0]
+    
     if not hmac.compare_digest(supplied_password, configured_password):
         return templates.TemplateResponse(
             request=request,
             name="admin.html",
-            context={"error": "Parol noto‘g‘ri.", "login": True, "output": None, "code": ""},
+            context={"login": True, "error": "Parol noto‘g‘ri."},
             status_code=401,
         )
 
@@ -81,37 +102,83 @@ async def admin_login(request: Request):
     return RedirectResponse("/admin", status_code=303)
 
 
-@app.post("/admin/run", response_class=HTMLResponse)
-async def admin_run(request: Request):
+@app.post("/admin/bot/create")
+async def admin_create_bot(request: Request):
     if not request.session.get("admin_authenticated"):
         return RedirectResponse("/admin", status_code=303)
-
+    
     raw_form = (await request.body()).decode("utf-8", errors="replace")
-    code = parse_qs(raw_form).get("code", [""])[0]
+    parsed = parse_qs(raw_form)
+    bot_name = parsed.get("bot_name", [""])[0].strip()
+    
+    if bot_name:
+        if not bot_name.endswith(".py"):
+            bot_name += ".py"
+        bot_path = BOTS_DIR / bot_name
+        if not bot_path.exists():
+            bot_path.write_text("# Yangi bot/skript kodi\nprint('Bot ishga tushdi!')\n", encoding="utf-8")
+            
+    return RedirectResponse(f"/admin?bot={bot_name}", status_code=303)
 
-    temp_file = BASE_DIR / "temp_exec.py"
-    temp_file.write_text(code, encoding="utf-8")
 
-    try:
-        result = subprocess.run(
-            [sys.executable, str(temp_file)],
-            capture_output=True,
-            text=True,
-            timeout=15
-        )
-        output = result.stdout if result.returncode == 0 else result.stderr
-        if not output:
-            output = "// Kod muvaffaqiyatli bajarildi (natija bo'sh)."
-    except Exception as e:
-        output = f"Xatolik: {str(e)}"
-    finally:
-        if temp_file.exists():
-            temp_file.unlink()
+@app.post("/admin/bot/save")
+async def admin_save_bot(request: Request):
+    if not request.session.get("admin_authenticated"):
+        return RedirectResponse("/admin", status_code=303)
+    
+    raw_form = (await request.body()).decode("utf-8", errors="replace")
+    parsed = parse_qs(raw_form)
+    bot_name = parsed.get("bot_name", [""])[0]
+    code = parsed.get("code", [""])[0]
+    
+    if bot_name:
+        bot_path = BOTS_DIR / bot_name
+        bot_path.write_text(code, encoding="utf-8")
+        
+    return RedirectResponse(f"/admin?bot={bot_name}", status_code=303)
+
+
+@app.post("/admin/bot/run")
+async def admin_run_bot(request: Request):
+    if not request.session.get("admin_authenticated"):
+        return RedirectResponse("/admin", status_code=303)
+    
+    raw_form = (await request.body()).decode("utf-8", errors="replace")
+    parsed = parse_qs(raw_form)
+    bot_name = parsed.get("bot_name", [""])[0]
+    
+    output = "Xatolik: Bot topilmadi."
+    if bot_name:
+        bot_path = BOTS_DIR / bot_name
+        if bot_path.exists():
+            try:
+                # 24/7 fonda yoki sinov tariqasida bajarish
+                result = subprocess.run(
+                    [sys.executable, str(bot_path)],
+                    capture_output=True,
+                    text=True,
+                    timeout=15
+                )
+                output = result.stdout if result.returncode == 0 else result.stderr
+                if not output:
+                    output = "// Bot muvaffaqiyatli bajarildi (natija bo'sh)."
+            except Exception as e:
+                output = f"Ijro etish xatoligi: {str(e)}"
+
+    bot_files = [f.name for f in BOTS_DIR.glob("*.py")]
+    code_content = (BOTS_DIR / bot_name).read_text(encoding="utf-8") if (BOTS_DIR / bot_name).exists() else ""
 
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
-        context={"error": None, "login": False, "output": output, "code": code}
+        context={
+            "login": False,
+            "error": None,
+            "bot_files": bot_files,
+            "selected_bot": bot_name,
+            "code": code_content,
+            "output": output
+        }
     )
 
 
@@ -119,13 +186,3 @@ async def admin_run(request: Request):
 async def admin_logout(request: Request):
     request.session.clear()
     return RedirectResponse("/admin", status_code=303)
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    return RedirectResponse("/static/favicon.svg", status_code=307)
-
-
-@app.get("/healthz", include_in_schema=False)
-async def healthz():
-    return Response(content="ok", media_type="text/plain")
