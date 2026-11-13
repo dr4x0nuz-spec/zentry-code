@@ -30,9 +30,6 @@ app.add_middleware(
     max_age=60 * 60 * 12,
 )
 
-# Faol bot jarayonlarini saqlash uchun lug'at (Process manager)
-active_processes = {}
-
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
@@ -61,7 +58,6 @@ async def admin(request: Request):
     if not request.session.get("admin_authenticated"):
         return templates.TemplateResponse(request=request, name="admin.html", context={"login": True, "error": None})
     
-    # Birlikdagi barcha bot fayllarini o'qish
     bot_files = [f.name for f in BOTS_DIR.glob("*.py")]
     selected_bot = request.query_params.get("bot", bot_files[0] if bot_files else "")
     
@@ -116,7 +112,7 @@ async def admin_create_bot(request: Request):
             bot_name += ".py"
         bot_path = BOTS_DIR / bot_name
         if not bot_path.exists():
-            bot_path.write_text("# Yangi bot/skript kodi\nprint('Bot ishga tushdi!')\n", encoding="utf-8")
+            bot_path.write_text("# Yangi bot yoki skript\nprint('Zentry-Code bot ishga tushdi!')\n", encoding="utf-8")
             
     return RedirectResponse(f"/admin?bot={bot_name}", status_code=303)
 
@@ -152,21 +148,23 @@ async def admin_run_bot(request: Request):
         bot_path = BOTS_DIR / bot_name
         if bot_path.exists():
             try:
-                # 24/7 fonda yoki sinov tariqasida bajarish
                 result = subprocess.run(
                     [sys.executable, str(bot_path)],
                     capture_output=True,
                     text=True,
-                    timeout=15
+                    timeout=20,
+                    cwd=str(BASE_DIR)
                 )
-                output = result.stdout if result.returncode == 0 else result.stderr
-                if not output:
+                output = result.stdout if result.stdout else ""
+                if result.stderr:
+                    output += f"\n[XATOLIK / STDERR]:\n{result.stderr}"
+                if not output.strip():
                     output = "// Bot muvaffaqiyatli bajarildi (natija bo'sh)."
             except Exception as e:
                 output = f"Ijro etish xatoligi: {str(e)}"
 
     bot_files = [f.name for f in BOTS_DIR.glob("*.py")]
-    code_content = (BOTS_DIR / bot_name).read_text(encoding="utf-8") if (BOTS_DIR / bot_name).exists() else ""
+    code_content = (BOTS_DIR / selected_bot).read_text(encoding="utf-8") if (selected_bot := bot_name) and (BOTS_DIR / bot_name).exists() else ""
 
     return templates.TemplateResponse(
         request=request,
@@ -176,6 +174,55 @@ async def admin_run_bot(request: Request):
             "error": None,
             "bot_files": bot_files,
             "selected_bot": bot_name,
+            "code": code_content,
+            "output": output
+        }
+    )
+
+
+@app.post("/admin/shell")
+async def admin_shell(request: Request):
+    if not request.session.get("admin_authenticated"):
+        return RedirectResponse("/admin", status_code=303)
+    
+    raw_form = (await request.body()).decode("utf-8", errors="replace")
+    parsed = parse_qs(raw_form)
+    cmd = parsed.get("cmd", [""])[0].strip()
+    selected_bot = parsed.get("selected_bot", [""])[0]
+    
+    output = f"$ {cmd}\n"
+    if cmd:
+        try:
+            result = subprocess.run(
+                cmd,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=40,
+                cwd=str(BASE_DIR)
+            )
+            if result.stdout:
+                output += result.stdout
+            if result.stderr:
+                output += f"\n{result.stderr}"
+            if not result.stdout and not result.stderr:
+                output += "// Buyruq bajarildi (natija qaytmadi)."
+        except Exception as e:
+            output += f"\nXatolik: {str(e)}"
+    else:
+        output += "Buyruq kiritilmadi."
+
+    bot_files = [f.name for f in BOTS_DIR.glob("*.py")]
+    code_content = (BOTS_DIR / selected_bot).read_text(encoding="utf-8") if selected_bot and (BOTS_DIR / selected_bot).exists() else ""
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "login": False,
+            "error": None,
+            "bot_files": bot_files,
+            "selected_bot": selected_bot,
             "code": code_content,
             "output": output
         }
