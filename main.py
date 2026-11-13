@@ -239,3 +239,8 @@ async def favicon():
 @app.get("/healthz", include_in_schema=False)
 async def healthz():
     return Response(content="ok", media_type="text/plain")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="144.124.192.59", port=80, reload=True)
