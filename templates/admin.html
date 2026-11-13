@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zentry-Code | Admin Terminal</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { background: #050508; color: #00ff66; font-family: monospace; padding: 20px; }
+        .box { max-width: 800px; margin: 40px auto; background: #0d0d12; border: 1px solid #ff0033; padding: 25px; box-shadow: 0 0 15px rgba(255,0,51,0.3); }
+        h2 { color: #ff0033; margin-top: 0; }
+        input, textarea { width: 100%; background: #000; color: #00ff66; border: 1px solid #00ff66; padding: 10px; font-family: monospace; box-sizing: border-box; margin-bottom: 15px; }
+        textarea { height: 240px; }
+        button { background: #ff0033; color: #fff; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; font-family: monospace; }
+        pre { background: #000; border: 1px dashed #00ff66; padding: 15px; white-space: pre-wrap; color: #00ff66; }
+        .err { color: #ff0033; margin-bottom: 10px; }
+        a { color: #00ff66; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        {% if login %}
+            <h2>// ZENTRY-CODE ADMIN AUTH</h2>
+            {% if error %}<div class="err">{{ error }}</div>{% endif %}
+            <form action="/admin/login" method="post">
+                <input type="password" name="password" placeholder="Admin parolni kiriting..." required>
+                <button type="submit">KIRISH</button>
+            </form>
+            <br><a href="/">&larr; Bosh sahifaga</a>
+        {% else %}
+            <h2>// ZENTRY-CODE EXECUTION TERMINAL</h2>
+            <form action="/admin/run" method="post">
+                <textarea name="code" placeholder="print('Salom Zentry-Code!')">{{ code }}</textarea>
+                <button type="submit">EXECUTE PYTHON</button>
+            </form>
+            {% if output is not none %}
+                <h3>// NATIJA:</h3>
+                <pre>{{ output }}</pre>
+            {% endif %}
+            <br>
+            <form action="/admin/logout" method="post" style="display:inline;">
+                <button type="submit" style="background:#333;">CHIQISH</button>
+            </form>
+            &nbsp;&nbsp;<a href="/">&larr; Bosh sahifaga</a>
+        {% endif %}
+    </div>
+</body>
+</html>
